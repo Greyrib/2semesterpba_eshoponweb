@@ -38,4 +38,8 @@
     <PackageReference Include="BlazorInputFile" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="infrastructure\Data\Migrations\" />
+  </ItemGroup>
+
 </Project>
