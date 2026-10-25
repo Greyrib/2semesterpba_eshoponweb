@@ -34,6 +34,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogMicroservice", "CatalogMicroservice\CatalogMicroservice.csproj", "{BE360937-3743-47CC-A503-57AC7F4CD06E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messaging", "Messaging\Messaging.csproj", "{0C7E4B96-FB8D-4EDF-AA8A-ACF5661AF3EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,6 +86,10 @@ Global
 		{BE360937-3743-47CC-A503-57AC7F4CD06E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE360937-3743-47CC-A503-57AC7F4CD06E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE360937-3743-47CC-A503-57AC7F4CD06E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C7E4B96-FB8D-4EDF-AA8A-ACF5661AF3EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C7E4B96-FB8D-4EDF-AA8A-ACF5661AF3EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C7E4B96-FB8D-4EDF-AA8A-ACF5661AF3EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C7E4B96-FB8D-4EDF-AA8A-ACF5661AF3EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,5 +105,8 @@ Global
 		{D6829485-DD9C-42CE-BEDE-4EB0E81021AC} = {BAA5312D-B54C-42D6-A3B9-504DD12F8250}
 		{698594AE-78D3-429F-B5CC-3A6F6BCE397A} = {BAA5312D-B54C-42D6-A3B9-504DD12F8250}
 		{EAD6CF0B-2979-462C-BBB9-AF723B1EB570} = {BAA5312D-B54C-42D6-A3B9-504DD12F8250}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6B3FE4A2-778C-48C5-8530-EACB3FC2F294}
 	EndGlobalSection
 EndGlobal
