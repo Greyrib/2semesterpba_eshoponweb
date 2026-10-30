@@ -32,8 +32,11 @@
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(AspNetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspNetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.14" />
     <PackageVersion Include="Microsoft.Extensions.Identity.Core" Version="$(AspNetVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Configuration" Version="$(SystemExtensionVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.14" />
     <PackageVersion Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="$(VSCodeGeneratorVersion)" />
     <PackageVersion Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EntityFramworkCoreVersion)" />
@@ -83,5 +86,7 @@
     <PackageVersion Include="Serilog.AspNetCore" Version="6.1.0-dev-00289" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="4.1.1-dev-00896" />
     <PackageVersion Include="Serilog.Sinks.Seq" Version="5.2.3-dev-00260" />
+    <!-- RabbitMQ -->
+    <PackageVersion Include="RabbitMQ.AMQP.Client" Version="1.4.1" />
   </ItemGroup>
 </Project>
