@@ -1,0 +1,11 @@
+// Original opgave-repo:
+https://github.com/dotnet-architecture/eShopOnWeb
+
+
+// Containerized-repo af eShopOnWeb
+// NOTE: Goto 'main' eller 'dev' branch, som reference - da repo'et er by-default moved til repo'et laengere nedenfor
+https://github.com/dotnet-architecture/eShopOnContainers
+
+
+// eShop	Det current, uptodate repo for projektet, med brug af Aspire, MAUI
+https://github.com/dotnet/eShop
