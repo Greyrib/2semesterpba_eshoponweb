@@ -8,6 +8,7 @@ services:
       dockerfile: src/Web/Dockerfile
     depends_on:
       - "sqlserver"
+
   eshoppublicapi:
     image: ${DOCKER_REGISTRY-}eshoppublicapi
     build:
@@ -15,6 +16,7 @@ services:
       dockerfile: src/PublicApi/Dockerfile
     depends_on:
       - "sqlserver"
+
   sqlserver:
     image: mcr.microsoft.com/azure-sql-edge
     ports:
@@ -22,6 +24,7 @@ services:
     environment:
       - SA_PASSWORD=@someThingComplicated1234
       - ACCEPT_EULA=Y
+
   sqlserverCatalog:
     image: mcr.microsoft.com/azure-sql-edge
     ports:
@@ -31,6 +34,12 @@ services:
       - ACCEPT_EULA=Y
     networks:
       - CatalogDbNetwork
+      
+  rabbitmq:
+    image: rabbitmq:4-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
 
 networks:
   CatalogDbNetwork:
