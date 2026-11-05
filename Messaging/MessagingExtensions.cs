@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Messaging;
 
@@ -25,7 +26,8 @@ public static class MessagingExtensions
         services.AddSingleton<IHostedService>(sp => new QueueConsumer<TMessage>(
             queue,
             sp.GetRequiredService<RabbitMqConnection>(),
-            sp.GetRequiredService<IServiceScopeFactory>()));
+            sp.GetRequiredService<IServiceScopeFactory>(),
+            sp.GetRequiredService<ILogger<QueueConsumer<TMessage>>>()));
         return services;
     }
 }

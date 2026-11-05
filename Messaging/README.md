@@ -5,3 +5,5 @@ Every service (monolith, CatalogMicroservice, future microservices) references t
 Each service defines its own message types locally — these are not shared. Copying a small record into each service is intentional, so services can change independently without needing to redeploy together.
 
 Sharing this plumbing is fine specifically because it carries no domain knowledge. Sharing message contracts would not be fine, since that would force services to agree on and update together.
+
+Each service's handlers deal with failures on their own terms. Anything they don't catch, and any message that can't be read, is logged as an error and moved to the `<queue>.dead` queue for manual action.

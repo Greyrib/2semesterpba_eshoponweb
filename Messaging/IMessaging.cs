@@ -6,10 +6,6 @@ using System.Threading.Tasks;
 
 namespace Messaging;
 
-//public interface IMessaging
-//{
-//}
-
 public interface IMessageSender
 {
     Task SendAsync<T> (string queue, T message, CancellationToken ct = default);

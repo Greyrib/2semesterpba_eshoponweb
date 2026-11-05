@@ -12,6 +12,8 @@ namespace Messaging;
 
 public class RabbitMqConnection : IMessageSender, IAsyncDisposable
 {
+    private const string DeadLetterExchange = "messaging.dead-letter";
+
     private readonly MessagingOptions _opt;
     private readonly SemaphoreSlim _lock = new(1, 1);
     private readonly Dictionary<string, IPublisher> _publishers = new();
@@ -27,7 +29,7 @@ public class RabbitMqConnection : IMessageSender, IAsyncDisposable
         try
         {
             if (_conn != null) return _conn;
-            _env = AmqpEnvironment.Create(ConnectionSettingsBuilder.Create()
+            _env ??= AmqpEnvironment.Create(ConnectionSettingsBuilder.Create()
                 .Host(_opt.Host).Port(_opt.Port)
                 .User(_opt.User).Password(_opt.Password)
                 .Build());
@@ -40,7 +42,22 @@ public class RabbitMqConnection : IMessageSender, IAsyncDisposable
     public async Task DeclareQueueAsync (string queue)
     {
         var conn = await GetConnectionAsync();
-        await conn.Management().Queue(queue).Type(QueueType.QUORUM).DeclareAsync();
+        var management = conn.Management();
+        var deadQueue = $"{queue}.dead";
+
+        await management.Exchange(DeadLetterExchange).Type(ExchangeType.DIRECT).DeclareAsync();
+        await management.Queue(deadQueue).Type(QueueType.QUORUM).DeclareAsync();
+        await management.Binding()
+            .SourceExchange(DeadLetterExchange)
+            .DestinationQueue(deadQueue)
+            .Key(queue)
+            .BindAsync();
+
+        await management.Queue(queue)
+            .Type(QueueType.QUORUM)
+            .DeadLetterExchange(DeadLetterExchange)
+            .DeadLetterRoutingKey(queue)
+            .DeclareAsync();
     }
 
     public async Task SendAsync<T> (string queue, T message, CancellationToken ct = default)
