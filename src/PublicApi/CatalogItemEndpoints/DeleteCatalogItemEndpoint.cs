@@ -1,11 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Messaging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.eShopWeb.ApplicationCore;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
+using Microsoft.Extensions.Options;
 using MinimalApi.Endpoint;
 
 namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
@@ -15,6 +19,15 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
 /// </summary>
 public class DeleteCatalogItemEndpoint : IEndpoint<IResult, DeleteCatalogItemRequest, IRepository<CatalogItem>>
 {
+    private readonly IMessageRequester _requester;
+    private readonly FeatureToggleOptions _featureToggles;
+
+    public DeleteCatalogItemEndpoint(IMessageRequester requester, IOptions<FeatureToggleOptions> featureToggles)
+    {
+        _requester = requester;
+        _featureToggles = featureToggles.Value;
+    }
+
     public void AddRoute(IEndpointRouteBuilder app)
     {
         app.MapDelete("api/catalog-items/{catalogItemId}",
@@ -30,6 +43,12 @@ public class DeleteCatalogItemEndpoint : IEndpoint<IResult, DeleteCatalogItemReq
     public async Task<IResult> HandleAsync(DeleteCatalogItemRequest request, IRepository<CatalogItem> itemRepository)
     {
         var response = new DeleteCatalogItemResponse(request.CorrelationId());
+
+        if (_featureToggles.UseCatalogMicroservice)
+        {
+            var deleted = await _requester.RequestAsync<object, bool>("catalog.delete-item", new { CatalogItemId = request.CatalogItemId }, TimeSpan.FromSeconds(5));
+            return deleted ? Results.Ok(response) : Results.NotFound();
+        }
 
         var itemToDelete = await itemRepository.GetByIdAsync(request.CatalogItemId);
         if (itemToDelete is null)

@@ -2,12 +2,15 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Messaging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.eShopWeb.ApplicationCore;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.ApplicationCore.Specifications;
+using Microsoft.Extensions.Options;
 using MinimalApi.Endpoint;
 
 namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
@@ -19,11 +22,15 @@ public class CatalogItemListPagedEndpoint : IEndpoint<IResult, ListPagedCatalogI
 {
     private readonly IUriComposer _uriComposer;
     private readonly IMapper _mapper;
+    private readonly IMessageRequester _requester;
+    private readonly FeatureToggleOptions _featureToggles;
 
-    public CatalogItemListPagedEndpoint(IUriComposer uriComposer, IMapper mapper)
+    public CatalogItemListPagedEndpoint(IUriComposer uriComposer, IMapper mapper, IMessageRequester requester, IOptions<FeatureToggleOptions> featureToggles)
     {
         _uriComposer = uriComposer;
         _mapper = mapper;
+        _requester = requester;
+        _featureToggles = featureToggles.Value;
     }
 
     public void AddRoute(IEndpointRouteBuilder app)
@@ -41,6 +48,22 @@ public class CatalogItemListPagedEndpoint : IEndpoint<IResult, ListPagedCatalogI
     {
         await Task.Delay(1000);
         var response = new ListPagedCatalogItemResponse(request.CorrelationId());
+
+        if (_featureToggles.UseCatalogMicroservice)
+        {
+            // Clanker-Claussen: local DB path makes 2 separate repo calls (CountAsync + ListAsync); bundled into 1 round-trip here since a network hop per call would be wasteful.
+            var query = new
+            {
+                request.PageSize,
+                request.PageIndex,
+                request.CatalogBrandId,
+                request.CatalogTypeId
+            };
+            var result = await _requester.RequestAsync<object, CatalogItemsPagedResult>("catalog.list-items-paged", query, TimeSpan.FromSeconds(5));
+            response.CatalogItems.AddRange(result?.CatalogItems ?? new());
+            response.PageCount = result?.PageCount ?? 0;
+            return Results.Ok(response);
+        }
 
         var filterSpec = new CatalogFilterSpecification(request.CatalogBrandId, request.CatalogTypeId);
         int totalItems = await itemRepository.CountAsync(filterSpec);
