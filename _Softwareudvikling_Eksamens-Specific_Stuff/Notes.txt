@@ -9,3 +9,31 @@ https://github.com/dotnet-architecture/eShopOnContainers
 
 // eShop	Det current, uptodate repo for projektet, med brug af Aspire, MAUI
 https://github.com/dotnet/eShop
+
+
+// WTF is the compose.override ?
+Docker's automatic override file ; when running 'docker compose up' with no explicit -f flags, it automerges compose & override.
+The convention is: Keep the compose lean, and put environment-specific / local dev settings in override - e.g. ASPNETCORE_ENVIRONMENT=Docker, port mappings to host, bind-mounting local HTTPS dev cert + user secrets into the container so the containerized app can use them
+
+// NuGet Versioner eksisterer samlet i Directory.Packages.props i root (i.e. individuelle .csproj's har dem ikke selv)
+
+// Difference between 0.9.1 & 1.0:
+AMQP 0-9-1 is a proprietary dialect invented by RabbitMQ's original creators (Rabbit Technologies/Pivotal) before a real standard existed. It was never ratified by any standards body — only RabbitMQ and a few forks ever implemented it.
+AMQP 1.0 is the actual OASIS-ratified international standard (approved 2012), unrelated in design to 0-9-1 despite the shared name. It's used by multiple brokers/platforms (Azure Service Bus, ActiveMQ, Apache Qpid), giving real cross-vendor interoperability.
+RabbitMQ only got native AMQP 1.0 support with RabbitMQ 4.0 (2024). Before that, AMQP 1.0 was only available via a plugin that translated it into/from RabbitMQ's internal 0-9-1 model — not a direct implementation.
+Because native 1.0 support is still new, parts of RabbitMQ's tooling (e.g. the management dashboard's per-queue stats/graphs) don't fully track it yet — this is a known maturity gap, not a sign of misconfiguration.
+
+- 1.0 variant example:
+conn.ConsumerBuilder().Queue(_queue).MessageHandler((ctx, msg) => ...).BuildAndStartAsync();
+// ctx.Accept() / ctx.Requeue() / ctx.Discard()
+
+- 0.9.1 / 'classic' example:
+channel.BasicConsume(queue, autoAck: false, consumer);
+consumer.Received += (sender, ea) => { ... };
+channel.BasicAck(ea.DeliveryTag, multiple: false);
+channel.BasicNack(ea.DeliveryTag, multiple: false, requeue: true);
+
+
+// Ardalis example
+https://github.com/zoran123456/Ardalis.Specification-Example
+

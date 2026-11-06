@@ -10,6 +10,8 @@
 *.userosscache
 *.sln.docstates
 *.env
+# .env itself is tracked on purpose: it only holds non-secret toggle defaults (e.g. USE_CATALOG_MICROSERVICE), not secrets like other *.env files.
+!.env
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

@@ -34,7 +34,19 @@ services:
       - ACCEPT_EULA=Y
     networks:
       - CatalogDbNetwork
-      
+
+  catalogmicroservice:
+    image: ${DOCKER_REGISTRY-}catalogmicroservice
+    build:
+      context: .
+      dockerfile: CatalogMicroservice/Dockerfile
+    depends_on:
+      - "sqlserverCatalog"
+      - "rabbitmq"
+    networks:
+      - default
+      - CatalogDbNetwork
+
   rabbitmq:
     image: rabbitmq:4-management
     ports:
