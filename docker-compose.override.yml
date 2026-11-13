@@ -4,6 +4,7 @@ services:
    environment:
      - ASPNETCORE_ENVIRONMENT=Docker
      - ASPNETCORE_URLS=http://+:8080
+     - FeatureToggles__UseCatalogMicroservice=${USE_CATALOG_MICROSERVICE}
    ports:
      - "5106:8080"
    volumes:
@@ -13,8 +14,18 @@ services:
    environment:
      - ASPNETCORE_ENVIRONMENT=Docker
      - ASPNETCORE_URLS=http://+:8080
+     - FeatureToggles__UseCatalogMicroservice=${USE_CATALOG_MICROSERVICE}
    ports:
      - "5200:8080"
+   volumes:
+     - ~/.aspnet/https:/root/.aspnet/https:ro
+     - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
+ catalogmicroservice:
+   environment:
+     - ASPNETCORE_ENVIRONMENT=Docker
+     - ASPNETCORE_URLS=http://+:8080
+   ports:
+     - "5234:8080"
    volumes:
      - ~/.aspnet/https:/root/.aspnet/https:ro
      - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro

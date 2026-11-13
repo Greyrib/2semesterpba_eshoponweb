@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <UserSecretsId>aspnetcorespa-c23d27a4-eb88-4b18-9b77-2a93f3b15119</UserSecretsId>
+    <TypeScriptCompileOnSaveEnabled>false</TypeScriptCompileOnSaveEnabled>
+    <IsTransformWebConfigDisabled>true</IsTransformWebConfigDisabled>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <GeneratedItemPatterns>wwwroot/dist/**</GeneratedItemPatterns>
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(GeneratedItemPatterns)</DefaultItemExcludes>
+    <TypeScriptToolsVersion>4.2</TypeScriptToolsVersion>    
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..\..</DockerfileContext>
+    <DockerComposeProjectPath>..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
+    <SpaRoot>Client\</SpaRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Setup\images.zip">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="appsettings.json;">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="web.config;">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\**\*;">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
+    <PackageReference Include="AspNetCore.HealthChecks.Uris" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
+    <PackageReference Include="Microsoft.ApplicationInsights.DependencyCollector" />
+    <PackageReference Include="Microsoft.ApplicationInsights.Kubernetes" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" />    
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.Seq" />
+  </ItemGroup>
+  
+  <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
+    <!-- Ensure Node.js is installed -->
+    <Exec Command="node --version" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+    </Exec>
+    <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
+    <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
+    <!--Reasoning for adding the 'legacy-peer-deps' cmd below : -->
+    <!--2020-era Angular assumed npm's old peer-dependency behaviour ; Modern npm enforces peer deps strictly by default & throws ERESOLVE when transitive package versions don't line up exactly -->
+    <!--Adding this tells npm to use the older, less-strict behaviour-->
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm install --legacy-peer-deps" /> 
+  </Target>
+  
+  <ProjectExtensions>
+    <VisualStudio><UserProperties package_1json__JSONSchema="http://json.schemastore.org/project-1.0.0-beta4" /></VisualStudio>
+  </ProjectExtensions>
+
+</Project>

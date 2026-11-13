@@ -26,8 +26,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using CatalogMicroservice.applicationCore.Services;
 using CatalogMicroservice.BlazorShared;
+using CatalogMicroservice.CatalogMicroservice.CatalogTypeEndpoints;
 using CatalogMicroservice.infrastructure.Data;
+using CatalogMicroservice.publicAPI.CatalogBrandEndpoints;
+using CatalogMicroservice.publicAPI.CatalogItemEndpoints;
+using Messaging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -84,6 +89,17 @@ builder.Services.Configure<BaseUrlConfiguration>(configSection);
 var baseUrlConfig = configSection.Get<BaseUrlConfiguration>();
 
 builder.Services.AddMemoryCache();
+
+builder.Services.AddMessaging(builder.Configuration.GetSection("Messaging").Bind);
+builder.Services.AddRequestHandler<GetCatalogItemByIdRequest, CatalogItemDto?, GetCatalogItemByIdHandler>("catalog.get-by-id");
+builder.Services.AddRequestHandler<ListCatalogBrandsRequest, List<CatalogBrandDto>, ListCatalogBrandsHandler>("catalog.list-brands");
+builder.Services.AddRequestHandler<ListCatalogTypesRequest, List<CatalogTypeDto>, ListCatalogTypesHandler>("catalog.list-types");
+builder.Services.AddRequestHandler<CatalogItemsPagedQuery, CatalogItemsPagedResult, ListCatalogItemsPagedHandler>("catalog.list-items-paged");
+builder.Services.AddRequestHandler<ListCatalogItemsByIdsRequest, List<CatalogItemDto>, ListCatalogItemsByIdsHandler>("catalog.list-items-by-ids");
+builder.Services.AddRequestHandler<CreateCatalogItemMessage, CreateCatalogItemResult, CreateCatalogItemHandler>("catalog.create-item");
+builder.Services.AddRequestHandler<UpdateCatalogItemMessage, CatalogItemDto?, UpdateCatalogItemHandler>("catalog.update-item");
+builder.Services.AddRequestHandler<UpdateCatalogItemDetailsMessage, CatalogItemDto?, UpdateCatalogItemDetailsHandler>("catalog.update-item-details");
+builder.Services.AddRequestHandler<DeleteCatalogItemRequest, bool, DeleteCatalogItemHandler>("catalog.delete-item");
 
 var key = Encoding.ASCII.GetBytes(AuthorizationConstants.JWT_SECRET_KEY);
 builder.Services.AddAuthentication(config =>
