@@ -63,6 +63,21 @@ public class CheckoutModel : PageModel
             _logger.LogWarning(emptyBasketOnCheckoutException.Message);
             return RedirectToPage("/Basket/Index");
         }
+        catch (OutOfStockException outOfStockException)
+        {
+            _logger.LogWarning(outOfStockException.Message);
+            var productNames = BasketModel.Items
+                .Where(i => outOfStockException.CatalogItemIds.Contains(i.CatalogItemId))
+                .Select(i => i.ProductName);
+            ModelState.AddModelError(string.Empty, $"Sorry, there isn't enough stock of: {string.Join(", ", productNames)}. Please lower the quantity and try again.");
+            return Page();
+        }
+        catch (InventoryUnavailableException inventoryUnavailableException)
+        {
+            _logger.LogWarning(inventoryUnavailableException.Message);
+            ModelState.AddModelError(string.Empty, "We couldn't check stock right now, so your order wasn't placed. Please try again in a moment.");
+            return Page();
+        }
 
         return RedirectToPage("Success");
     }

@@ -42,6 +42,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messaging", "Messaging\Mess
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExamTests", "tests\ExamTests\ExamTests.csproj", "{7AD37BD8-7601-4562-A03E-514064D7E9CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryMicroservice", "InventoryMicroservice\InventoryMicroservice.csproj", "{2220CD70-B533-427C-8261-5ABBBC858590}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -232,6 +234,18 @@ Global
 		{7AD37BD8-7601-4562-A03E-514064D7E9CE}.Release|x64.Build.0 = Release|Any CPU
 		{7AD37BD8-7601-4562-A03E-514064D7E9CE}.Release|x86.ActiveCfg = Release|Any CPU
 		{7AD37BD8-7601-4562-A03E-514064D7E9CE}.Release|x86.Build.0 = Release|Any CPU
+		{2220CD70-B533-427C-8261-5ABBBC858590}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2220CD70-B533-427C-8261-5ABBBC858590}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2220CD70-B533-427C-8261-5ABBBC858590}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2220CD70-B533-427C-8261-5ABBBC858590}.Debug|x64.Build.0 = Debug|Any CPU
+		{2220CD70-B533-427C-8261-5ABBBC858590}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2220CD70-B533-427C-8261-5ABBBC858590}.Debug|x86.Build.0 = Debug|Any CPU
+		{2220CD70-B533-427C-8261-5ABBBC858590}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2220CD70-B533-427C-8261-5ABBBC858590}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2220CD70-B533-427C-8261-5ABBBC858590}.Release|x64.ActiveCfg = Release|Any CPU
+		{2220CD70-B533-427C-8261-5ABBBC858590}.Release|x64.Build.0 = Release|Any CPU
+		{2220CD70-B533-427C-8261-5ABBBC858590}.Release|x86.ActiveCfg = Release|Any CPU
+		{2220CD70-B533-427C-8261-5ABBBC858590}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

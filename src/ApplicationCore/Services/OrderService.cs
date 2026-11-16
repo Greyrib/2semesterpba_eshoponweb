@@ -7,6 +7,7 @@ using Messaging;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
 using Microsoft.eShopWeb.ApplicationCore.Entities.BasketAggregate;
 using Microsoft.eShopWeb.ApplicationCore.Entities.OrderAggregate;
+using Microsoft.eShopWeb.ApplicationCore.Exceptions;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.ApplicationCore.Specifications;
 using Microsoft.Extensions.Options;
@@ -58,9 +59,39 @@ public class OrderService : IOrderService
             return orderItem;
         }).ToList();
 
+        if (_featureToggles.UseInventoryMicroservice)
+        {
+            await DecrementStockInInventoryMicroservice(basket.Items);
+        }
+
         var order = new Order(basket.BuyerId, shippingAddress, items);
 
         await _orderRepository.AddAsync(order);
+    }
+
+    // Throws instead of returning, so CreateOrderAsync stops before saving an order that can't be fulfilled.
+    private async Task DecrementStockInInventoryMicroservice(IEnumerable<BasketItem> basketItems)
+    {
+        var request = new
+        {
+            Items = basketItems.Select(i => new { i.CatalogItemId, i.Quantity }).ToList()
+        };
+
+        DecrementStockResult? result;
+        try
+        {
+            result = await _requester.RequestAsync<object, DecrementStockResult>(
+                "inventory.decrement-stock", request, TimeSpan.FromSeconds(5));
+        }
+        catch (Exception ex)
+        {
+            // e.g. RabbitMQ itself unreachable
+            throw new InventoryUnavailableException(ex);
+        }
+
+        // RequestAsync returns null when no reply arrived before the timeout.
+        if (result == null) throw new InventoryUnavailableException();
+        if (!result.Success) throw new OutOfStockException(result.OutOfStockCatalogItemIds);
     }
 
     // Clanker-Claussen: both branches return the same RemoteCatalogItemDto shape so CreateOrderAsync's mapping above doesn't need its own if/else;

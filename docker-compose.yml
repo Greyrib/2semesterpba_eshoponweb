@@ -47,6 +47,28 @@ services:
       - default
       - CatalogDbNetwork
 
+  sqlserverInventory:
+    image: mcr.microsoft.com/azure-sql-edge
+    ports:
+      - "1435:1433"
+    environment:
+      - SA_PASSWORD=@someThingComplicated1234
+      - ACCEPT_EULA=Y
+    networks:
+      - InventoryDbNetwork
+
+  inventorymicroservice:
+    image: ${DOCKER_REGISTRY-}inventorymicroservice
+    build:
+      context: .
+      dockerfile: InventoryMicroservice/Dockerfile
+    depends_on:
+      - "sqlserverInventory"
+      - "rabbitmq"
+    networks:
+      - default
+      - InventoryDbNetwork
+
   rabbitmq:
     image: rabbitmq:4-management
     ports:
@@ -55,4 +77,6 @@ services:
 
 networks:
   CatalogDbNetwork:
+    driver: bridge
+  InventoryDbNetwork:
     driver: bridge
