@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.test.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Messaging\Messaging.csproj" />
+    <ProjectReference Include="..\..\src\PublicApi\PublicApi.csproj" />
+    <!-- Aliased: CatalogMicroservice defines types with the same full names as the monolith's ApplicationCore.
+         Files that need it opt in with: extern alias CatalogMs; -->
+    <ProjectReference Include="..\..\CatalogMicroservice\CatalogMicroservice.csproj" Aliases="CatalogMs" />
+  </ItemGroup>
+
+</Project>

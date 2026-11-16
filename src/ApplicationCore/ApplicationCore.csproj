@@ -15,6 +15,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\BlazorShared\BlazorShared.csproj" />
+	  <ProjectReference Include="..\..\Messaging\Messaging.csproj" />
 	</ItemGroup>
 
 </Project>

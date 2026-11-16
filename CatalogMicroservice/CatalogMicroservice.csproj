@@ -42,4 +42,8 @@
     <Folder Include="infrastructure\Data\Migrations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Messaging\Messaging.csproj" />
+  </ItemGroup>
+
 </Project>

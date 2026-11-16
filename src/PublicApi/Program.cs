@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using BlazorShared;
+using Messaging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.eShopWeb;
+using Microsoft.eShopWeb.ApplicationCore;
 using Microsoft.eShopWeb.ApplicationCore.Constants;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.ApplicationCore.Services;
@@ -50,6 +52,10 @@ builder.Services.Configure<BaseUrlConfiguration>(configSection);
 var baseUrlConfig = configSection.Get<BaseUrlConfiguration>();
 
 builder.Services.AddMemoryCache();
+
+builder.Services.Configure<FeatureToggleOptions>(builder.Configuration.GetSection("FeatureToggles"));
+builder.Services.AddMessaging(builder.Configuration.GetSection("Messaging").Bind);
+builder.Services.AddRequestResponse(replyQueue: "publicapi.catalog.replies");
 
 var key = Encoding.ASCII.GetBytes(AuthorizationConstants.JWT_SECRET_KEY);
 builder.Services.AddAuthentication(config =>
