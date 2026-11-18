@@ -88,5 +88,10 @@
     <PackageVersion Include="Serilog.Sinks.Seq" Version="5.2.3-dev-00260" />
     <!-- RabbitMQ -->
     <PackageVersion Include="RabbitMQ.AMQP.Client" Version="1.4.1" />
+    <!-- E2E Testing -->
+    <PackageVersion Include="NUnit" Version="3.14.0" />
+    <PackageVersion Include="NUnit.Analyzers" Version="3.9.0" />
+    <PackageVersion Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageVersion Include="Microsoft.Playwright.NUnit" Version="1.49.0" />
   </ItemGroup>
 </Project>
