@@ -7,7 +7,7 @@ This must be run first, on the machine doing the E2E-testing
 NOTE: If you get an error related to script running being disabled, do this to permit it for the current session:
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
-The app you're testing should also be running.
+The app you're testing (and all associated required services, e.g. CatalogMicroservice if that feature toggle is on) should also be running.
 For this project, you can compose up the entire project - this should result in the MVC running on the appropriate port.
 
 # Running the E2E tests
