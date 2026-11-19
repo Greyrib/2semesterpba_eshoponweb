@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  eshoppublicapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      # BEWARE : THIS ONLY RESOLVES FROM A .ENV-FILE IN THE WORKING DIR AT COMMAND RUN TIME
+      - FeatureToggles__UseCatalogMicroservice=${USE_CATALOG_MICROSERVICE}
+
+networks:
+  CatalogDbNetwork:
+    driver: overlay # overrides the network-type, because we need this type when swarming
