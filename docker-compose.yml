@@ -37,6 +37,7 @@ services:
 
   catalogmicroservice:
     image: ${DOCKER_REGISTRY-}catalogmicroservice
+    deploy: { replicas: 1 }
     build:
       context: .
       dockerfile: CatalogMicroservice/Dockerfile

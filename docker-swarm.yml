@@ -1,0 +1,27 @@
+version: "3.4" # Required ; hver file der passes skal bruge samme version, ellers bli'r Swarm angery
+services:
+  eshopwebmvc:
+    deploy:
+      replicas: 1
+
+  eshoppublicapi:
+    deploy:
+      replicas: 1
+
+  sqlserver:
+    deploy:
+      replicas: 1
+
+  sqlserverCatalog:
+    deploy:
+      replicas: 1
+
+  catalogmicroservice:
+    deploy:
+      replicas: 2
+
+  rabbitmq:
+    deploy:
+      replicas: 1
+
+
