@@ -2,7 +2,7 @@ name: Pull Request
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, main_ai]
 
 jobs:
   workflow_job:
