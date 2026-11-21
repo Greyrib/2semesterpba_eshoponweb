@@ -1,4 +1,4 @@
-extern alias CatalogMs;
+﻿extern alias CatalogMs;
 
 using CatalogMs::CatalogMicroservice.applicationCore.Entities;
 using CatalogMs::CatalogMicroservice.applicationCore.Services;

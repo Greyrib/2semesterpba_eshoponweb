@@ -8,10 +8,10 @@ namespace Messaging;
 
 public interface IMessageSender
 {
-    Task SendAsync<T> (string queue, T message, CancellationToken ct = default);
+    Task SendAsync<T>(string queue, T message, CancellationToken ct = default);
 }
 
 public interface IMessageHandler<in T>
 {
-    Task HandleAsync (T message, CancellationToken ct);
+    Task HandleAsync(T message, CancellationToken ct);
 }

@@ -1,4 +1,4 @@
-namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
+﻿namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
 
 // Mirrors CatalogMicroservice's CreateCatalogItemResult (same property names, JSON-compatible).
 public class CreateCatalogItemResult

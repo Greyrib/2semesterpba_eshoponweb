@@ -17,7 +17,7 @@ public class QueueConsumer<T> : BackgroundService
     private readonly IServiceScopeFactory _scopes;
     private readonly ILogger<QueueConsumer<T>> _logger;
 
-    public QueueConsumer (string queue, RabbitMqConnection rabbit, IServiceScopeFactory scopes, ILogger<QueueConsumer<T>> logger)
+    public QueueConsumer(string queue, RabbitMqConnection rabbit, IServiceScopeFactory scopes, ILogger<QueueConsumer<T>> logger)
     {
         _queue = queue;
         _rabbit = rabbit;
@@ -25,7 +25,7 @@ public class QueueConsumer<T> : BackgroundService
         _logger = logger;
     }
 
-    protected override async Task ExecuteAsync (CancellationToken ct)
+    protected override async Task ExecuteAsync(CancellationToken ct)
     {
         await Task.Yield();
 

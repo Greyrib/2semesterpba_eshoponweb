@@ -1,4 +1,4 @@
-namespace eShopConContainers.WebSPA;
+﻿namespace eShopConContainers.WebSPA;
 
 public class Startup
 {
@@ -127,7 +127,7 @@ public class Startup
             spa.Options.SourcePath = "Client";
 
             if (env.IsDevelopment())
-            { 
+            {
 
                 // use the SpaServices extension method for angular, that will make the application to run "ng serve" for us, when in development.
                 spa.UseAngularCliServer(npmScript: "start");

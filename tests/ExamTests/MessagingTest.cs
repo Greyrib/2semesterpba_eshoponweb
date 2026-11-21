@@ -1,4 +1,4 @@
-using Messaging;
+﻿using Messaging;
 using NSubstitute;
 using Xunit;
 

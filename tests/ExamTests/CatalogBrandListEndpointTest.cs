@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using MinimalApi.Endpoint;
 using Microsoft.eShopWeb;
 using Microsoft.eShopWeb.PublicApi.CatalogBrandEndpoints;
+using MinimalApi.Endpoint;
 using Xunit;
 
 namespace ExamTests;

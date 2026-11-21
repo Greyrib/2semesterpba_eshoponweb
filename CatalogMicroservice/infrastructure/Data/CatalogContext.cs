@@ -6,8 +6,8 @@ namespace CatalogMicroservice.infrastructure.Data;
 
 public class CatalogContext : DbContext
 {
-    #pragma warning disable CS8618 // Required by Entity Framework
-    public CatalogContext(DbContextOptions<CatalogContext> options) : base(options) {}
+#pragma warning disable CS8618 // Required by Entity Framework
+    public CatalogContext(DbContextOptions<CatalogContext> options) : base(options) { }
 
     public DbSet<CatalogItem> CatalogItems { get; set; }
     public DbSet<CatalogBrand> CatalogBrands { get; set; }
