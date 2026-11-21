@@ -1,5 +1,5 @@
-﻿using Microsoft.eShopWeb.CatalogMicroservice.Interfaces;
-using Microsoft.eShopWeb.CatalogMicroservice.Entities;
+﻿using Microsoft.eShopWeb.CatalogMicroservice.Entities;
+using Microsoft.eShopWeb.CatalogMicroservice.Interfaces;
 
 namespace CatalogMicroservice.applicationCore.Entities;
 

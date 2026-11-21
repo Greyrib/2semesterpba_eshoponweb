@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using RabbitMQ.AMQP.Client;
 using RabbitMQ.AMQP.Client.Impl;
-using Microsoft.Extensions.Options;
 
 namespace Messaging;
 
@@ -20,9 +20,9 @@ public class RabbitMqConnection : IMessageSender, IAsyncDisposable
     private IEnvironment? _env;
     private IConnection? _conn;
 
-    public RabbitMqConnection (IOptions<MessagingOptions> opt) => _opt = opt.Value;
+    public RabbitMqConnection(IOptions<MessagingOptions> opt) => _opt = opt.Value;
 
-    public async Task<IConnection> GetConnectionAsync ()
+    public async Task<IConnection> GetConnectionAsync()
     {
         if (_conn != null) return _conn;
         await _lock.WaitAsync();
@@ -39,7 +39,7 @@ public class RabbitMqConnection : IMessageSender, IAsyncDisposable
         finally { _lock.Release(); }
     }
 
-    public async Task DeclareQueueAsync (string queue)
+    public async Task DeclareQueueAsync(string queue)
     {
         var conn = await GetConnectionAsync();
         var management = conn.Management();
@@ -60,7 +60,7 @@ public class RabbitMqConnection : IMessageSender, IAsyncDisposable
             .DeclareAsync();
     }
 
-    public async Task SendAsync<T> (string queue, T message, CancellationToken ct = default)
+    public async Task SendAsync<T>(string queue, T message, CancellationToken ct = default)
     {
         var conn = await GetConnectionAsync();
 
@@ -80,7 +80,7 @@ public class RabbitMqConnection : IMessageSender, IAsyncDisposable
         finally { _lock.Release(); }
     }
 
-    public async ValueTask DisposeAsync ()
+    public async ValueTask DisposeAsync()
     {
         if (_env != null) await _env.CloseAsync();
     }

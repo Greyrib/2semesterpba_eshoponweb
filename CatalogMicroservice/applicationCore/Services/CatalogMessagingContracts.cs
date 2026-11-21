@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CatalogMicroservice.publicAPI.CatalogItemEndpoints;
 
 namespace CatalogMicroservice.applicationCore.Services;

@@ -11,7 +11,7 @@ namespace Messaging;
 
 public static class MessagingExtensions
 {
-    public static IServiceCollection AddMessaging (this IServiceCollection services, Action<MessagingOptions> configure)
+    public static IServiceCollection AddMessaging(this IServiceCollection services, Action<MessagingOptions> configure)
     {
         services.Configure(configure);
         services.AddSingleton<RabbitMqConnection>();
@@ -19,7 +19,7 @@ public static class MessagingExtensions
         return services;
     }
 
-    public static IServiceCollection AddQueueConsumer<TMessage, THandler> (this IServiceCollection services, string queue)
+    public static IServiceCollection AddQueueConsumer<TMessage, THandler>(this IServiceCollection services, string queue)
         where THandler : class, IMessageHandler<TMessage>
     {
         services.AddScoped<IMessageHandler<TMessage>, THandler>();
@@ -33,7 +33,7 @@ public static class MessagingExtensions
 
     // Lets callers do SendAsync-then-await-reply instead of pure fire-and-forget.
     // replyQueue is where this process listens for replies correlated back to its own requests.
-    public static IServiceCollection AddRequestResponse (this IServiceCollection services, string replyQueue)
+    public static IServiceCollection AddRequestResponse(this IServiceCollection services, string replyQueue)
     {
         services.AddSingleton(sp => new MessageRequester(
             sp.GetRequiredService<IMessageSender>(),
@@ -51,7 +51,7 @@ public static class MessagingExtensions
 
     // Registered on the side that answers requests (e.g. CatalogMicroservice): listens on
     // requestQueue, runs THandler, and publishes the result to replyQueue itself.
-    public static IServiceCollection AddRequestHandler<TRequest, TResponse, THandler> (this IServiceCollection services, string requestQueue)
+    public static IServiceCollection AddRequestHandler<TRequest, TResponse, THandler>(this IServiceCollection services, string requestQueue)
         where THandler : class, IRequestHandler<TRequest, TResponse>
     {
         services.AddScoped<IRequestHandler<TRequest, TResponse>, THandler>();

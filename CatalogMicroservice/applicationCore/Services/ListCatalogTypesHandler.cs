@@ -1,10 +1,10 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CatalogMicroservice.applicationCore.Entities;
-using Messaging;
 using CatalogMicroservice.CatalogMicroservice.CatalogTypeEndpoints;
+using Messaging;
 using Microsoft.eShopWeb.CatalogMicroservice.Interfaces;
 
 namespace CatalogMicroservice.applicationCore.Services;

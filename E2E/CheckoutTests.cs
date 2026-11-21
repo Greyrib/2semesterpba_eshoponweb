@@ -11,7 +11,7 @@ public class CheckoutTests : PageTest
     private const string BaseUrl = "http://localhost:5106";
 
     [Test]
-    public async Task AddItemToBasket_Checkout_Pay_Succeeds ()
+    public async Task AddItemToBasket_Checkout_Pay_Succeeds()
     {
         await Page.GotoAsync(BaseUrl);
 

@@ -18,7 +18,7 @@ namespace CatalogMicroservice.CatalogMicroservice.CatalogItemEndpoints;
 /// Updates a Catalog Item
 /// </summary>
 public class UpdateCatalogItemEndpoint : IEndpoint<IResult, UpdateCatalogItemRequest, IRepository<CatalogItem>>
-{ 
+{
     private readonly IUriComposer _uriComposer;
 
     public UpdateCatalogItemEndpoint(IUriComposer uriComposer)
