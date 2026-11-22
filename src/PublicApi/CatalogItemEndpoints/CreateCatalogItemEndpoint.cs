@@ -8,6 +8,8 @@ using Microsoft.eShopWeb.ApplicationCore.Entities;
 using Microsoft.eShopWeb.ApplicationCore.Exceptions;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.ApplicationCore.Specifications;
+using Microsoft.eShopWeb.PublicApi.Messaging;
+using Microsoft.Extensions.Configuration;
 using MinimalApi.Endpoint;
 
 namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
@@ -17,11 +19,15 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
 /// </summary>
 public class CreateCatalogItemEndpoint : IEndpoint<IResult, CreateCatalogItemRequest, IRepository<CatalogItem>>
 {
+    private readonly CatalogQueue _queue;
+    private readonly IConfiguration _config;
     private readonly IUriComposer _uriComposer;
 
-    public CreateCatalogItemEndpoint(IUriComposer uriComposer)
+    public CreateCatalogItemEndpoint(IUriComposer uriComposer, CatalogQueue queue, IConfiguration config)
     {
         _uriComposer = uriComposer;
+        _queue = queue;
+        _config = config;
     }
 
     public void AddRoute(IEndpointRouteBuilder app)
@@ -38,6 +44,12 @@ public class CreateCatalogItemEndpoint : IEndpoint<IResult, CreateCatalogItemReq
 
     public async Task<IResult> HandleAsync(CreateCatalogItemRequest request, IRepository<CatalogItem> itemRepository)
     {
+        if (_config.GetValue<bool>("FeatureFlags:UseCatalogMicroservice"))
+        {
+            await _queue.SendAsync("CreateCatalogItem", request);
+            return Results.Accepted();
+        }
+
         var response = new CreateCatalogItemResponse(request.CorrelationId());
 
         var catalogItemNameSpecification = new CatalogItemNameSpecification(request.Name);

@@ -41,6 +41,7 @@ public class MessageConsumer
 
             IConsumer consumer = await connection.ConsumerBuilder()
             .Queue(queueName)
+            .InitialCredits(2)
             .MessageHandler((ctx, message) =>
             {
                 Console.WriteLine($"Received a message: {Encoding.UTF8.GetString(message.Body()!)}");

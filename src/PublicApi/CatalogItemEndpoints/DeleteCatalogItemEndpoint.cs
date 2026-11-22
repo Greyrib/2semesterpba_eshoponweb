@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
+using Microsoft.eShopWeb.PublicApi.Messaging;
+using Microsoft.Extensions.Configuration;
 using MinimalApi.Endpoint;
 
 namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
@@ -15,6 +17,15 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
 /// </summary>
 public class DeleteCatalogItemEndpoint : IEndpoint<IResult, DeleteCatalogItemRequest, IRepository<CatalogItem>>
 {
+    private readonly CatalogQueue _queue;
+    private readonly IConfiguration _config;
+
+    public DeleteCatalogItemEndpoint(CatalogQueue queue, IConfiguration config)
+    {
+        _queue = queue;
+        _config = config;
+    }
+
     public void AddRoute(IEndpointRouteBuilder app)
     {
         app.MapDelete("api/catalog-items/{catalogItemId}",
@@ -29,6 +40,12 @@ public class DeleteCatalogItemEndpoint : IEndpoint<IResult, DeleteCatalogItemReq
 
     public async Task<IResult> HandleAsync(DeleteCatalogItemRequest request, IRepository<CatalogItem> itemRepository)
     {
+        if (_config.GetValue<bool>("FeatureFlags:UseCatalogMicroservice"))
+        {
+            await _queue.SendAsync("DeleteCatalogItem", request);
+            return Results.Accepted();
+        }
+
         var response = new DeleteCatalogItemResponse(request.CorrelationId());
 
         var itemToDelete = await itemRepository.GetByIdAsync(request.CatalogItemId);

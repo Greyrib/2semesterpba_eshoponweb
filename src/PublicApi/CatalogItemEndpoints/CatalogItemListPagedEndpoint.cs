@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.ApplicationCore.Specifications;
+using Microsoft.eShopWeb.PublicApi.Messaging;
+using Microsoft.Extensions.Configuration;
 using MinimalApi.Endpoint;
 
 namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
@@ -17,13 +19,17 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
 /// </summary>
 public class CatalogItemListPagedEndpoint : IEndpoint<IResult, ListPagedCatalogItemRequest, IRepository<CatalogItem>>
 {
+    private readonly CatalogRpcClient _rpc;
+    private readonly IConfiguration _config;
     private readonly IUriComposer _uriComposer;
     private readonly IMapper _mapper;
 
-    public CatalogItemListPagedEndpoint(IUriComposer uriComposer, IMapper mapper)
+    public CatalogItemListPagedEndpoint(IUriComposer uriComposer, IMapper mapper, CatalogRpcClient rpc, IConfiguration config)
     {
         _uriComposer = uriComposer;
         _mapper = mapper;
+        _rpc = rpc;
+        _config = config;
     }
 
     public void AddRoute(IEndpointRouteBuilder app)
@@ -39,6 +45,22 @@ public class CatalogItemListPagedEndpoint : IEndpoint<IResult, ListPagedCatalogI
 
     public async Task<IResult> HandleAsync(ListPagedCatalogItemRequest request, IRepository<CatalogItem> itemRepository)
     {
+        if (_config.GetValue<bool>("FeatureFlags:UseCatalogMicroservice"))
+        {
+            try
+            {
+                var page = await _rpc.RequestAsync<object, ListPagedCatalogItemResponse>(
+                    "ListCatalogItemsPaged",
+                    new { request.PageIndex, request.PageSize, request.CatalogBrandId, request.CatalogTypeId });
+
+                return Results.Ok(page);
+            }
+            catch (TimeoutException)
+            {
+                return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+            }
+        }
+
         await Task.Delay(1000);
         var response = new ListPagedCatalogItemResponse(request.CorrelationId());
 

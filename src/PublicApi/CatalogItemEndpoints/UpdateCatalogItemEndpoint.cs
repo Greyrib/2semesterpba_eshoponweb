@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
+using Microsoft.eShopWeb.PublicApi.Messaging;
+using Microsoft.Extensions.Configuration;
 using MinimalApi.Endpoint;
 
 namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
@@ -14,12 +16,16 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
 /// Updates a Catalog Item
 /// </summary>
 public class UpdateCatalogItemEndpoint : IEndpoint<IResult, UpdateCatalogItemRequest, IRepository<CatalogItem>>
-{ 
+{
+    private readonly CatalogQueue _queue;
+    private readonly IConfiguration _config;
     private readonly IUriComposer _uriComposer;
 
-    public UpdateCatalogItemEndpoint(IUriComposer uriComposer)
+    public UpdateCatalogItemEndpoint(IUriComposer uriComposer, CatalogQueue queue, IConfiguration config)
     {
         _uriComposer = uriComposer;
+        _queue = queue;
+        _config = config;
     }
 
     public void AddRoute(IEndpointRouteBuilder app)
@@ -36,6 +42,12 @@ public class UpdateCatalogItemEndpoint : IEndpoint<IResult, UpdateCatalogItemReq
 
     public async Task<IResult> HandleAsync(UpdateCatalogItemRequest request, IRepository<CatalogItem> itemRepository)
     {
+        if (_config.GetValue<bool>("FeatureFlags:UseCatalogMicroservice"))
+        {
+            await _queue.SendAsync("UpdateCatalogItem", request);
+            return Results.Accepted();
+        }
+
         var response = new UpdateCatalogItemResponse(request.CorrelationId());
 
         var existingItem = await itemRepository.GetByIdAsync(request.Id);
