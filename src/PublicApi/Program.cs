@@ -4,6 +4,7 @@ using System.Text;
 using BlazorShared;
 using Messaging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.eShopWeb.ApplicationCore.BasketMessaging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.eShopWeb;
@@ -56,6 +57,8 @@ builder.Services.AddMemoryCache();
 builder.Services.Configure<FeatureToggleOptions>(builder.Configuration.GetSection("FeatureToggles"));
 builder.Services.AddMessaging(builder.Configuration.GetSection("Messaging").Bind);
 builder.Services.AddRequestResponse(replyQueue: "publicapi.catalog.replies");
+builder.Services.AddSingleton<BasketQueue>();
+builder.Services.AddSingleton<BasketRpcClient>();
 
 var key = Encoding.ASCII.GetBytes(AuthorizationConstants.JWT_SECRET_KEY);
 builder.Services.AddAuthentication(config =>
@@ -129,6 +132,9 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+// BasketQueue/BasketRpcClient connect lazily on first use now, not here - an eager connect
+// crashed the FunctionalTests host (no RabbitMQ available there). See their class comments.
 
 app.Logger.LogInformation("PublicApi App created...");
 

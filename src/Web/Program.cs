@@ -7,6 +7,7 @@ using Blazored.LocalStorage;
 using BlazorShared;
 using Messaging;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.eShopWeb.ApplicationCore.BasketMessaging;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -69,6 +70,8 @@ builder.Services.AddWebServices(builder.Configuration);
 builder.Services.Configure<FeatureToggleOptions>(builder.Configuration.GetSection("FeatureToggles"));
 builder.Services.AddMessaging(builder.Configuration.GetSection("Messaging").Bind);
 builder.Services.AddRequestResponse(replyQueue: "web.catalog.replies");
+builder.Services.AddSingleton<BasketQueue>();
+builder.Services.AddSingleton<BasketRpcClient>();
 
 // Add memory cache services
 builder.Services.AddMemoryCache();
@@ -122,6 +125,9 @@ builder.Services.AddBlazorServices();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 var app = builder.Build();
+
+// BasketQueue/BasketRpcClient connect lazily on first use now, not here - an eager connect
+// crashed the FunctionalTests host (no RabbitMQ available there). See their class comments.
 
 app.Logger.LogInformation("App created...");
 
