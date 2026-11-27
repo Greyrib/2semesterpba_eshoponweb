@@ -7,7 +7,10 @@ services:
       context: .
       dockerfile: src/Web/Dockerfile
     depends_on:
-      - "sqlserver"
+      sqlserver:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   eshoppublicapi:
     image: ${DOCKER_REGISTRY-}eshoppublicapi
@@ -15,7 +18,10 @@ services:
       context: .
       dockerfile: src/PublicApi/Dockerfile
     depends_on:
-      - "sqlserver"
+      sqlserver:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   sqlserver:
     image: mcr.microsoft.com/azure-sql-edge
@@ -41,17 +47,33 @@ services:
       context: .
       dockerfile: CatalogMicroservice/Dockerfile
     depends_on:
-      - "sqlserverCatalog"
-      - "rabbitmq"
+      sqlserverCatalog:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - default
       - CatalogDbNetwork
+
+  basketmicroservice:
+    image: ${DOCKER_REGISTRY-}basketmicroservice
+    build:
+      context: .
+      dockerfile: BasketMicroservice/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   rabbitmq:
     image: rabbitmq:4-management
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 networks:
   CatalogDbNetwork:

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.eShopWeb;
 using Microsoft.eShopWeb.ApplicationCore;
+using Microsoft.eShopWeb.ApplicationCore.BasketMessaging;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.Infrastructure.Data;
 using Microsoft.eShopWeb.Infrastructure.Identity;
@@ -69,6 +70,8 @@ builder.Services.AddWebServices(builder.Configuration);
 builder.Services.Configure<FeatureToggleOptions>(builder.Configuration.GetSection("FeatureToggles"));
 builder.Services.AddMessaging(builder.Configuration.GetSection("Messaging").Bind);
 builder.Services.AddRequestResponse(replyQueue: "web.catalog.replies");
+builder.Services.AddSingleton<BasketQueue>();
+builder.Services.AddSingleton<BasketRpcClient>();
 
 // Add memory cache services
 builder.Services.AddMemoryCache();
@@ -122,6 +125,9 @@ builder.Services.AddBlazorServices();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 var app = builder.Build();
+
+// BasketQueue/BasketRpcClient connect lazily on first use now, not here - an eager connect
+// crashed the FunctionalTests host (no RabbitMQ available there). See their class comments.
 
 app.Logger.LogInformation("App created...");
 

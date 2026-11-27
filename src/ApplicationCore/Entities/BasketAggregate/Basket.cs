@@ -39,4 +39,14 @@ public class Basket : BaseEntity, IAggregateRoot
     {
         BuyerId = buyerId;
     }
+
+    // Reconstructs a basket from a BasketMicroservice reply, preserving its Id and its
+    // items' Ids (needed because the Web pages key form updates off those Ids). Not used
+    // by the normal EF-backed path.
+    internal static Basket Rehydrate(int id, string buyerId, IEnumerable<BasketItem> items)
+    {
+        var basket = new Basket(buyerId) { Id = id };
+        basket._items.AddRange(items);
+        return basket;
+    }
 }

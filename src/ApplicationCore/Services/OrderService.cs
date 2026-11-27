@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Messaging;
+using Microsoft.eShopWeb.ApplicationCore.BasketMessaging;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
 using Microsoft.eShopWeb.ApplicationCore.Entities.BasketAggregate;
 using Microsoft.eShopWeb.ApplicationCore.Entities.OrderAggregate;
@@ -20,6 +21,7 @@ public class OrderService : IOrderService
     private readonly IRepository<Basket> _basketRepository;
     private readonly IRepository<CatalogItem> _itemRepository;
     private readonly IMessageRequester _requester;
+    private readonly BasketRpcClient? _basketRpc;
     private readonly FeatureToggleOptions _featureToggles;
 
     public OrderService(IRepository<Basket> basketRepository,
@@ -27,7 +29,8 @@ public class OrderService : IOrderService
         IRepository<Order> orderRepository,
         IUriComposer uriComposer,
         IMessageRequester requester,
-        IOptions<FeatureToggleOptions> featureToggles)
+        IOptions<FeatureToggleOptions> featureToggles,
+        BasketRpcClient? basketRpc = null)
     {
         _orderRepository = orderRepository;
         _uriComposer = uriComposer;
@@ -35,12 +38,16 @@ public class OrderService : IOrderService
         _itemRepository = itemRepository;
         _requester = requester;
         _featureToggles = featureToggles.Value;
+        _basketRpc = basketRpc;
     }
 
     public async Task CreateOrderAsync(int basketId, Address shippingAddress)
     {
-        var basketSpec = new BasketWithItemsSpecification(basketId);
-        var basket = await _basketRepository.FirstOrDefaultAsync(basketSpec);
+        // Basket now lives in BasketMicroservice (not this process's DB) once that toggle is
+        // on - reading it via BasketWithItemsSpecification here would always come back empty.
+        var basket = _featureToggles.UseBasketMicroservice
+            ? await GetBasketFromMicroservice(basketId)
+            : await GetBasketFromLocalDatabase(basketId);
 
         Guard.Against.Null(basket, nameof(basket));
         Guard.Against.EmptyBasketOnCheckout(basket.Items);
@@ -61,6 +68,22 @@ public class OrderService : IOrderService
         var order = new Order(basket.BuyerId, shippingAddress, items);
 
         await _orderRepository.AddAsync(order);
+    }
+
+    private async Task<Basket?> GetBasketFromLocalDatabase(int basketId)
+    {
+        var basketSpec = new BasketWithItemsSpecification(basketId);
+        return await _basketRepository.FirstOrDefaultAsync(basketSpec);
+    }
+
+    private async Task<Basket?> GetBasketFromMicroservice(int basketId)
+    {
+        var dto = await _basketRpc!.RequestAsync<GetBasketByIdQuery, BasketDto>(
+            "GetBasketById", new GetBasketByIdQuery(basketId));
+        if (dto is null) return null;
+
+        var items = dto.Items.Select(i => BasketItem.Rehydrate(i.Id, i.CatalogItemId, i.UnitPrice, i.Quantity));
+        return Basket.Rehydrate(dto.Id, dto.BuyerId, items);
     }
 
     // Clanker-Claussen: both branches return the same RemoteCatalogItemDto shape so CreateOrderAsync's mapping above doesn't need its own if/else;

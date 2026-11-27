@@ -30,4 +30,9 @@ public class BasketItem : BaseEntity
 
         Quantity = quantity;
     }
+
+    // Reconstructs an item from a BasketMicroservice reply, preserving its Id (needed because
+    // the Web pages key form updates off BasketItem.Id). Not used by the normal EF-backed path.
+    internal static BasketItem Rehydrate(int id, int catalogItemId, decimal unitPrice, int quantity) =>
+        new BasketItem(catalogItemId, quantity, unitPrice) { Id = id };
 }

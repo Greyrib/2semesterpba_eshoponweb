@@ -5,6 +5,7 @@ services:
      - ASPNETCORE_ENVIRONMENT=Docker
      - ASPNETCORE_URLS=http://+:8080
      - FeatureToggles__UseCatalogMicroservice=${USE_CATALOG_MICROSERVICE}
+     - FeatureToggles__UseBasketMicroservice=${USE_BASKET_MICROSERVICE}
    ports:
      - "5106:8080"
    volumes:
@@ -15,6 +16,7 @@ services:
      - ASPNETCORE_ENVIRONMENT=Docker
      - ASPNETCORE_URLS=http://+:8080
      - FeatureToggles__UseCatalogMicroservice=${USE_CATALOG_MICROSERVICE}
+     - FeatureToggles__UseBasketMicroservice=${USE_BASKET_MICROSERVICE}
    ports:
      - "5200:8080"
    volumes:
@@ -26,6 +28,15 @@ services:
      - ASPNETCORE_URLS=http://+:8080
    ports:
      - "5234:8080"
+   volumes:
+     - ~/.aspnet/https:/root/.aspnet/https:ro
+     - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
+ basketmicroservice:
+   environment:
+     - ASPNETCORE_ENVIRONMENT=Docker
+     - ASPNETCORE_URLS=http://+:8080
+   ports:
+     - "5235:8080"
    volumes:
      - ~/.aspnet/https:/root/.aspnet/https:ro
      - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
