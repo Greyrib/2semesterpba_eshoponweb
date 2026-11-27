@@ -19,6 +19,12 @@ public class CatalogQueue : IAsyncDisposable
     private IConnection? _connection;
     private IPublisher? _publisher;
 
+    public const string CommandsQueue = "catalog-commands";
+    public const string QueriesQueue = "catalog-queries";
+    public const string DeadQueue = "catalog-commands.dead";
+    public const string InvalidQueue = "catalog-commands.invalid";
+    public const string DeadExchange = "catalog-dlx";
+
     public CatalogQueue(IConfiguration config) => _config = config;
 
     public async Task InitializeAsync()
@@ -32,10 +38,23 @@ public class CatalogQueue : IAsyncDisposable
         _connection = await _environment.CreateConnectionAsync();
 
         IManagement management = _connection.Management();
-        IQueueSpecification queueSpec = management
-            .Queue(taskQueueName)
-            .Type(QueueType.QUORUM);
-        await queueSpec.DeclareAsync();
+        await management.Exchange(DeadExchange).Type(ExchangeType.DIRECT).DeclareAsync();
+        await management.Queue(DeadQueue).Type(QueueType.QUORUM).DeclareAsync();
+        await management.Queue(InvalidQueue).Type(QueueType.QUORUM).DeclareAsync();
+        await management.Binding()
+            .SourceExchange(DeadExchange)
+            .DestinationQueue(DeadQueue)
+            .Key(DeadQueue)
+            .BindAsync();
+
+        await management.Queue(CommandsQueue)
+            .Type(QueueType.QUORUM)
+            .DeadLetterExchange(DeadExchange)
+            .DeadLetterRoutingKey(DeadQueue)
+            .Quorum().DeliveryLimit(3).Queue()
+            .DeclareAsync();
+
+        await management.Queue(QueriesQueue).Type(QueueType.QUORUM).DeclareAsync();
 
         _publisher = await _connection.PublisherBuilder()
             .Queue(taskQueueName)

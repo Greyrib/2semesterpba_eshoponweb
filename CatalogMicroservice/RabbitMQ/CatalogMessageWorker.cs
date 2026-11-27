@@ -15,6 +15,11 @@ public class CatalogMessageWorker : BackgroundService
     const string brokerUri = "amqp://guest:guest@localhost:5672/%2f";
     private const string CommandsQueue = "catalog-commands";
     private const string QueriesQueue = "catalog-queries";
+    public const string DeadQueue = "catalog-commands.dead";
+    public const string InvalidQueue = "catalog-commands.invalid";
+    public const string DeadExchange = "catalog-dlx";
+
+    private IPublisher? _invalidPublisher;
 
     private static readonly JsonSerializerOptions Json = new() { PropertyNameCaseInsensitive = true };
 
@@ -37,8 +42,28 @@ public class CatalogMessageWorker : BackgroundService
         IEnvironment environment = AmqpEnvironment.Create(settings);
         IConnection connection = await environment.CreateConnectionAsync();
 
-        await connection.Management().Queue(CommandsQueue).Type(QueueType.QUORUM).DeclareAsync();
-        await connection.Management().Queue(QueriesQueue).Type(QueueType.QUORUM).DeclareAsync();
+        var management = connection.Management();
+
+        // Dead-letter exchange + the two "parking" queues
+        await management.Exchange(DeadExchange).Type(ExchangeType.DIRECT).DeclareAsync();
+        await management.Queue(DeadQueue).Type(QueueType.QUORUM).DeclareAsync();
+        await management.Queue(InvalidQueue).Type(QueueType.QUORUM).DeclareAsync();
+        await management.Binding()
+            .SourceExchange(DeadExchange)
+            .DestinationQueue(DeadQueue)
+            .Key(DeadQueue)
+            .BindAsync();
+
+        await management.Queue(CommandsQueue)
+            .Type(QueueType.QUORUM)
+            .DeadLetterExchange(DeadExchange)
+            .DeadLetterRoutingKey(DeadQueue)
+            .Quorum().DeliveryLimit(3).Queue()
+            .DeclareAsync();
+
+        await management.Queue(QueriesQueue).Type(QueueType.CLASSIC).DeclareAsync();
+
+        _invalidPublisher = await connection.PublisherBuilder().Queue(InvalidQueue).BuildAsync();
 
         //Commands
         var commandsConsumer = await connection.ConsumerBuilder()
@@ -62,6 +87,7 @@ public class CatalogMessageWorker : BackgroundService
 
         await commandsConsumer.CloseAsync();
         await responder.CloseAsync();
+        if (_invalidPublisher is not null) await _invalidPublisher.CloseAsync();
         await connection.CloseAsync();
         await environment.CloseAsync();
 
@@ -74,7 +100,6 @@ public class CatalogMessageWorker : BackgroundService
         {
             var body = (byte[])msg.Body();
             using var scope = _scopes.CreateScope();
-
             var sp = scope.ServiceProvider;
             var repo = sp.GetRequiredService<IRepository<CatalogItem>>();
 
@@ -99,11 +124,27 @@ public class CatalogMessageWorker : BackgroundService
 
             ctx.Accept();
         }
+        catch (Exception ex) when (ex is JsonException or InvalidMessageException)
+        {
+            //invalid
+            var parked = new AmqpMessage((byte[])msg.Body())
+                .Subject(msg.Subject() ?? "")
+                .Property("error", ex.Message);
+
+            var outcome = await _invalidPublisher!.PublishAsync(parked);
+            if (outcome.Outcome.State == OutcomeState.Accepted)
+                ctx.Accept();
+            else
+                ctx.Requeue();
+        }
         catch (Exception ex)
         {
-            ctx.Discard();
+            //failed. Dead letter
+            ctx.Requeue();
         }
     }
+
+    private sealed class InvalidMessageException(string message) : Exception(message);
 
     public async Task<(string Status, object? Result)> RunQueryAsync(IMessage request)
     {
