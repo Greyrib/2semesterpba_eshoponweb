@@ -1,4 +1,4 @@
-namespace BasketMicroservice.RabbitMQ;
+﻿namespace BasketMicroservice.RabbitMQ;
 
 /// <summary>
 /// This project is deliberately standalone (no reference to the ApplicationCore/Messaging

@@ -1,4 +1,4 @@
-using RabbitMQ.AMQP.Client;
+﻿using RabbitMQ.AMQP.Client;
 
 namespace BasketMicroservice.RabbitMQ;
 
